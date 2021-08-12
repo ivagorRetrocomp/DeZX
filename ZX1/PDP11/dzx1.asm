@@ -7,9 +7,9 @@
 ; jsr pc,unlzsa1
 ;
 ;v 1.0 - 2021-02-18
-;126 bytes
+;v 1.1 - 2021-08-12 (-16 bytes and faster)
+;110 bytes
 ;
-		
 		
 dzx1:
 		mov #177777,r4
@@ -31,16 +31,12 @@ dzx1_ldir2:
 		add r0,r0
 		bcc dzx1_literals 
 dzx1_new_offset:
-		sub #256.,r3
-		bic #255.,r3
-		add r3,r3
-		bisb (r1)+,r3
-		bis #256.,r3
+		movb (r1)+,r3
 		ror r3
+		bis #177600,r3
 		bcc dzx1_msb_skip
-		clr r5
+		mov #256.,r5
 		bisb (r1)+,r5
-		bis #256.,r5
 		ror r5
 		inc r5
 		rol r3
@@ -60,10 +56,9 @@ dzx1_elias_loop:
 		add r0,r0
 		bcc dzx1_ret
 		bne dzx1_elias_skip
-		clr r0
+		ror r0
 		bisb (r1)+,r0
 		swab r0
-		bis #128.,r0
 		add r0,r0
 		bcc dzx1_ret
 dzx1_elias_skip:

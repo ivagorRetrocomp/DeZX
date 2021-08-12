@@ -7,8 +7,9 @@
 ; jsr pc,dzx2
 ;
 ;v 1.0 - 2021-03-18
+;v 1.1 - 2021-08-12 (-4 bytes and faster)
 ;version for -x -z compressor option
-;74 bytes
+;70 bytes
 ;
 
 dzx2:
@@ -41,10 +42,9 @@ dzx2_elias:
 dzx2_elias_loop:
 		add r0,r0
 		bne dzx2_elias_skip
-		clr r0
+		ror r0
 		bisb (r1)+,r0
 		swab r0
-		bis #128.,r0
 		add r0,r0
 dzx2_elias_skip:
 		bcs dzx2_elias_skip2

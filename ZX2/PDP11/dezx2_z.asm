@@ -7,8 +7,9 @@
 ; jsr pc,dzx2
 ;
 ;v 1.0 - 2021-03-18
+;v 1.1 - 2021-08-12 (-4 bytes and faster)
 ;version for -z compressor option
-;80 bytes
+;76 bytes
 ;
 
 dzx2:

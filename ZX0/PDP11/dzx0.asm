@@ -7,7 +7,8 @@
 ; jsr pc,unlzsa1
 ;
 ;v 1.0 - 2021-02-18
-;102 bytes
+;v 1.1 - 2021-08-12 (-4 bytes and faster)
+;98 bytes
 ;
 
 dzx0:
@@ -51,10 +52,9 @@ dzx0_elias:
 dzx0_elias_loop:
 		add r0,r0
 		bne dzx0_elias_skip
-		clr r0
+		ror r0
 		bisb (r1)+,r0
 		swab r0
-		bis #128.,r0
 		add r0,r0
 dzx0_elias_skip:
 		bcc dzx0_elias_backtrack
@@ -64,5 +64,3 @@ dzx0_elias_backtrack:
 		add r0,r0
 		rol r3
 		br dzx0_elias_loop
-
-		

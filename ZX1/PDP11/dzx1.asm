@@ -8,12 +8,14 @@
 ;
 ;v 1.0 - 2021-02-18
 ;v 1.1 - 2021-08-12 (-16 bytes and faster)
-;110 bytes
+;v 1.2 - 2021-08-13 (-2 bytes and faster)
+;108 bytes
 ;
 		
 dzx1:
 		mov #177777,r4
 		mov #32768.,r0
+		clr r3
 dzx1_literals:
 		jsr pc,dzx1_elias
 dzx1_ldir1:
@@ -31,27 +33,26 @@ dzx1_ldir2:
 		add r0,r0
 		bcc dzx1_literals 
 dzx1_new_offset:
-		movb (r1)+,r3
-		ror r3
-		bis #177600,r3
+		movb (r1)+,r4
+		ror r4
+		bis #177600,r4
 		bcc dzx1_msb_skip
 		mov #256.,r5
 		bisb (r1)+,r5
 		ror r5
 		inc r5
-		rol r3
+		rol r4
 		bic #177400,r5
 		beq dzx1_ret
-		bic #177400,r3
+		bic #177400,r4
 		swab r5
-		bis r5,r3
+		bis r5,r4
 dzx1_msb_skip:
-		mov r3,r4
 		jsr pc,dzx1_elias
 		inc r3
-		br dzx1_copy 
+		br dzx1_copy
 dzx1_elias:
-		mov #1,r3
+		inc r3
 dzx1_elias_loop:
 		add r0,r0
 		bcc dzx1_ret

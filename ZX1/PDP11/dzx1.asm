@@ -4,7 +4,7 @@
 ;usage:
 ; mov #src_adr,r1
 ; mov #dst_adr,r2
-; jsr pc,unlzsa1
+; jsr pc,dzx1
 ;
 ;v 1.0 - 2021-02-18
 ;v 1.1 - 2021-08-12 (-16 bytes and faster)

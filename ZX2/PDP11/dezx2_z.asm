@@ -8,12 +8,14 @@
 ;
 ;v 1.0 - 2021-03-18
 ;v 1.1 - 2021-08-12 (-4 bytes and faster)
+;v 1.2 - 2021-08-13 (faster)
 ;version for -z compressor option
 ;76 bytes
 ;
 
 dzx2:
 		mov #32768.,r0
+		clr r3
 dzx2_literals:
 		jsr pc,dzx2_elias
 dzx2_ldir1:
@@ -39,7 +41,7 @@ dzx2_new_offset:
 		inc r3
 		br dzx2_copy 
 dzx2_elias:
-		mov #1,r3
+		inc r3
 dzx2_elias_loop:
 		add r0,r0
 		bne dzx2_elias_skip

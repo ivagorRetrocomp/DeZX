@@ -5,6 +5,7 @@
 ; v2 (2021-02-17) - 101 bytes forward / 100 bytes backward
 ; v3 (2021-02-22) - 99 bytes forward / 98 bytes backward
 ; v4 (2021-02-23) - 98 bytes forward / 97 bytes backward
+; v5 (2021-08-16) - 94 bytes forward and backward (slightly faster)
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   HL: source address (compressed data)
@@ -25,13 +26,14 @@
 #define NEXT_BC inx b
 #endif
 
+
 dzx0_standard:
 #ifdef BACKWARD
-        lxi d,1
+		lxi d,1
 		push d
 		dcr e
 #else
-        lxi d,0FFFFh
+		lxi d,0FFFFh
 		push d
 		inx d
 #endif
@@ -39,7 +41,6 @@ dzx0_standard:
 dzx0s_literals:
 		call dzx0s_elias
 		call ldir
-		add a
 		jc dzx0s_new_offset
 		call dzx0s_elias
 dzx0s_copy:
@@ -49,30 +50,28 @@ dzx0s_copy:
 		call ldir
 		pop h
 		xthl
-		add a
 		jnc dzx0s_literals
 dzx0s_new_offset:
 		call dzx0s_elias
+		inx sp
+		inx sp
 #ifdef BACKWARD
-		inx sp
-		inx sp
 		dcr d
 		rz
 		dcr e
-		mov d,e
-#else
-		mov d,a
-		pop psw
-		xra a
-		sub e
-		rz
-		mov e,d
-		mov d,a
-		mov a,e
-#endif
 		push b
 		mov b,a
-		mov a,d\ rar\ mov d,a
+		mov a,e
+#else
+		inr e
+		dcr e
+		rz
+		push b
+		mov b,a
+		xra a
+		sub e
+#endif
+		rar\ mov d,a
 		mov a,m
 		rar\ mov e,a
 		mov a,b
@@ -108,8 +107,7 @@ dzx0s_elias_backtrack:
 		xchg\ dad h\ xchg
 		add a
 		jnc dzx0s_elias_loop
-		inr e
-		jmp dzx0s_elias_loop
+		jmp dzx0s_elias
 		
 ldir:
 		push psw						
@@ -123,6 +121,7 @@ ldir_loop:
 		ora e
 		jnz ldir_loop
 		pop psw
+		add a
 		ret
 
 		.end

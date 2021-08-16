@@ -3,6 +3,7 @@
 ; Based on ZX2 z80 decoder by Einar Saukas
 ;
 ; v1 (2021-03-18) - 68-79 bytes forward / 68-78 bytes backward
+; v2 (2021-08-16) - 67-78 bytes forward / 67-77 bytes backward
 ;
 ; ZX2_X_SKIP_INCREMENT (compressor -x option) - -4 bytes
 ; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -6 bytes forward / -5 bytes backward
@@ -50,7 +51,6 @@ dzx2:
 dzx2n_literals:
 		call dzx2n_elias
 		call ldir
-		add a
 		jc dzx2n_new_offset
 dzx2n_reuse:
 		call dzx2n_elias
@@ -61,7 +61,6 @@ dzx2n_copy:
 		call ldir
 		pop h
 		xthl
-		add a
 		jnc dzx2n_literals
 dzx2n_new_offset:
 		pop d
@@ -114,6 +113,7 @@ ldir_loop:
 		dcr d
 		jnz ldir_loop
 		mov a,e
+		add a
 #else		
 		xchg\ dad h\ xchg
 		add a
@@ -132,6 +132,7 @@ ldir_loop:
 		ora d
 		jnz ldir_loop
 		pop psw
+		add a
 #endif
 		ret
 

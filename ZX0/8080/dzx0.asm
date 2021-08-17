@@ -6,6 +6,7 @@
 ; v3 (2021-02-22) - 99 bytes forward / 98 bytes backward
 ; v4 (2021-02-23) - 98 bytes forward / 97 bytes backward
 ; v5 (2021-08-16) - 94 bytes forward and backward (slightly faster)
+; v6 (2021-08-17) - 92 bytes forward / 94 bytes backward (forward version slightly faster)
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   HL: source address (compressed data)
@@ -53,9 +54,9 @@ dzx0s_copy:
 		jnc dzx0s_literals
 dzx0s_new_offset:
 		call dzx0s_elias
-		inx sp
-		inx sp
 #ifdef BACKWARD
+		inx sp
+		inx sp
 		dcr d
 		rz
 		dcr e
@@ -63,13 +64,13 @@ dzx0s_new_offset:
 		mov b,a
 		mov a,e
 #else
-		inr e
-		dcr e
-		rz
-		push b
-		mov b,a
+		mov d,a
+		pop psw
 		xra a
 		sub e
+		rz
+		push b
+		mov b,d
 #endif
 		rar\ mov d,a
 		mov a,m

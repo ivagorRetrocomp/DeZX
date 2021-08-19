@@ -33,7 +33,7 @@
 #define NEXT_BC inx b
 #endif
 
-dzx2_standard:
+dzx2:
 #ifdef BACKWARD
 #ifdef ZX2_Z_IGNORE_DEFAULT 
 		mvi d,0

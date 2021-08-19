@@ -4,9 +4,10 @@
 ;
 ; v1 (2021-03-18) - 68-79 bytes forward / 68-78 bytes backward
 ; v2 (2021-08-16) - 67-78 bytes forward / 67-77 bytes backward
+; v3 (2021-08-19) - 66-78 bytes forward / 66-77 bytes backward (-1 byte with -y option)
 ;
 ; ZX2_X_SKIP_INCREMENT (compressor -x option) - -4 bytes
-; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -6 bytes forward / -5 bytes backward
+; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -7 bytes forward / -6 bytes backward
 ; ZX2_Z_IGNORE_DEFAULT (compressor -z option) - -1 byte
 ; BACKWARD (compressor -b option) - -1 byte (without ZX2_Y_LIMIT_LENGTH)
 ; -----------------------------------------------------------------------------
@@ -32,7 +33,7 @@
 #define NEXT_BC inx b
 #endif
 
-dzx2:
+dzx2_standard:
 #ifdef BACKWARD
 #ifdef ZX2_Z_IGNORE_DEFAULT 
 		mvi d,0
@@ -96,15 +97,14 @@ dzx2n_elias_loop:
 		mov a,m
 		NEXT_HL
 		ral
-dzx2n_elias_skip:
-		rnc
 #ifdef ZX2_Y_LIMIT_LENGTH
+dzx2n_elias_skip:
 		mov e,a
+		rnc
 		xchg\ dad h\ xchg
 		mov a,e
 		jmp dzx2n_elias_loop
 ldir:
-		mov e,a
 ldir_loop:
 		mov a,m
 		stax b
@@ -113,8 +113,9 @@ ldir_loop:
 		dcr d
 		jnz ldir_loop
 		mov a,e
-		add a
 #else		
+dzx2n_elias_skip:
+		rnc
 		xchg\ dad h\ xchg
 		add a
 		jnc dzx2n_elias_loop
@@ -132,8 +133,8 @@ ldir_loop:
 		ora d
 		jnz ldir_loop
 		pop psw
-		add a
 #endif
+		add a
 		ret
 
 		.end

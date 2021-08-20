@@ -5,11 +5,12 @@
 ; v1 (2021-03-18) - 68-79 bytes forward / 68-78 bytes backward
 ; v2 (2021-08-16) - 67-78 bytes forward / 67-77 bytes backward
 ; v3 (2021-08-19) - 66-78 bytes forward / 66-77 bytes backward (-1 byte with -y option)
+; v4 (2021-08-20) - 66-78 bytes forward / 65-77 bytes backward (-1 byte with {-y and -b options})
 ;
 ; ZX2_X_SKIP_INCREMENT (compressor -x option) - -4 bytes
-; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -7 bytes forward / -6 bytes backward
+; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -7 bytes
 ; ZX2_Z_IGNORE_DEFAULT (compressor -z option) - -1 byte
-; BACKWARD (compressor -b option) - -1 byte (without ZX2_Y_LIMIT_LENGTH)
+; BACKWARD (compressor -b option) - -1 byte
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   HL: source address (compressed data)
@@ -83,7 +84,11 @@ dzx2n_new_offset:
 #endif
 dzx2n_elias:
 #ifdef ZX2_Y_LIMIT_LENGTH
+#ifdef BACKWARD
+		inr d							
+#else
 		mvi d,1
+#endif
 #else
 #ifdef BACKWARD
 		mvi e,1
@@ -105,13 +110,12 @@ dzx2n_elias_skip:
 		mov a,e
 		jmp dzx2n_elias_loop
 ldir:
-ldir_loop:
 		mov a,m
 		stax b
 		NEXT_HL
 		NEXT_BC
 		dcr d
-		jnz ldir_loop
+		jnz ldir
 		mov a,e
 #else		
 dzx2n_elias_skip:

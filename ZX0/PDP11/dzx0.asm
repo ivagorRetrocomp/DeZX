@@ -1,4 +1,4 @@
-;ZX0 PDP-11 decoder by Ivan Gorodetsky
+;ZX0 "classic" PDP-11 decoder by Ivan Gorodetsky
 ;Based on ZX0 z80 decoder by Einar Saukas
 ;
 ;usage:
@@ -8,7 +8,8 @@
 ;
 ;v 1.0 - 2021-02-18
 ;v 1.1 - 2021-08-12 (-4 bytes and faster)
-;98 bytes
+;v 1.2 - 2021-10-04 (-2 bytes and slightly faster)
+;96 bytes
 ;
 
 dzx0:
@@ -33,10 +34,10 @@ dzx0_ldir2:
 		bcc dzx0_literals 
 dzx0_new_offset:
 		jsr pc,dzx0_elias
-		neg r3
-		swab r3
-		bic #255.,r3
+		negb r3
 		beq dzx0_ret
+		swab r3
+		clrb r3
 		bisb (r1)+,r3
 		sec
 		ror r3

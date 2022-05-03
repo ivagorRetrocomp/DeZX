@@ -7,6 +7,7 @@
 ; v3 (2021-02-22) - 124 bytes forward / 128 bytes backward
 ; v4 (2021-02-25) - 124 bytes forward / 128 bytes backward (faster version)
 ; v5 (2021-02-25) - 128 bytes forward / 132 bytes backward (+4 bytes, bug fix)
+; v6 (2022-05-03) - 128 bytes forward / 130 bytes backward (2% faster, backward version -2 bytes)
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   DE: source address (compressed data)
@@ -29,36 +30,41 @@
 #define NEXT_BC inx b
 #endif
 
-dzx1_standard:
+dzx1:
 #ifdef BACKWARD
 		lxi h,1
+		shld Offset
+		dcr l
 #else
 		lxi h,0FFFFh
-#endif
 		shld Offset
+		inx h
+#endif
 		mvi a,080h
-dzx1s_literals:
-		call dzx1s_elias
+dzx1_literals:
+		inr l
+		add a
+		cc dzx1_elias
 		push psw
 		dcx h
 		inr l
-dzx1s_ldir1:
+		inr h
+dzx1_ldir1:
 		ldax d
 		stax b
 		NEXT_DE
 		NEXT_BC
 		dcr l
-		jnz dzx1s_ldir1
-		xra a
-		ora h
-		jz $+7
+		jnz dzx1_ldir1
 		dcr h
-		jmp dzx1s_ldir1
+		jnz dzx1_ldir1
 		pop psw
 		add a
-		jc dzx1s_new_offset
-		call dzx1s_elias
-dzx1s_copy:
+		jc dzx1_new_offset
+		inr l
+		add a
+		cc dzx1_elias
+dzx1_copy:
 		push d
 		xchg
 		lhld Offset
@@ -66,76 +72,79 @@ dzx1s_copy:
 		push psw
 		dcx d
 		inr e
-dzx1s_ldir2:
+		inr d
+dzx1_ldir2:
 		mov a,m
 		stax b
 		NEXT_HL
 		NEXT_BC
 		dcr e
-		jnz dzx1s_ldir2
-		xra a
-		ora d
-		jz $+7
+		jnz dzx1_ldir2
 		dcr d
-		jmp dzx1s_ldir2
+		jnz dzx1_ldir2
 		pop psw
 		xchg
 		pop d
 		add a
-		jnc dzx1s_literals
-dzx1s_new_offset:
+		jnc dzx1_literals
+dzx1_new_offset:
 #ifdef BACKWARD
 		ora a
-#else
-		dcr h
-#endif
 		push psw
+#else
+		mov h,a
+#endif
 		ldax d
 		NEXT_DE
 		rar\ mov l,a
-		jnc dzx1s_msb_skip
+		jnc dzx1_msb_skip
 		ldax d
 		NEXT_DE
 #ifdef BACKWARD
 		ora a
 		rar\ rar\ adc a
+		jnz $+5
+		pop psw
+		ret
+		mov h,a
+		dcr h
+		mov a,l\ ral\ mov l,a
+dzx1_msb_skip:
+		pop psw
+		inr l
 #else
 		rar\ inr a
-#endif
-		jz dzx1s_exit
+		rz
+		push h
 		mov h,a
-#ifdef BACKWARD
-		dcr h
-#endif
 		mov a,l\ ral\ mov l,a
-dzx1s_msb_skip:
 		pop psw
-#ifdef BACKWARD
-		inr l
+		jmp $+6
+dzx1_msb_skip:
+		mov a,h
+		mvi h,0FFh
 #endif
 		shld Offset
-		call dzx1s_elias
-		inx h
-		jmp dzx1s_copy
-dzx1s_elias:
 		lxi h,1
-dzx1s_elias_loop:	
+		add a
+		cc dzx1_elias
+		inx h
+		jmp dzx1_copy
+dzx1_elias_loop:
 		add a
 		rnc
-		jnz dzx1s_elias_skip
+dzx1_elias:
+		jnz dzx1_elias_skip
 		ldax d
 		NEXT_DE
 		ral
 		rnc
-dzx1s_elias_skip:
+dzx1_elias_skip:
 		dad h
 		add a
-		jnc dzx1s_elias_loop
+		jnc dzx1_elias_loop
 		inr l
-		jmp dzx1s_elias_loop
-dzx1s_exit:
-		pop psw
-		ret
+		jmp dzx1_elias_loop
 
 Offset:
 		.dw 0

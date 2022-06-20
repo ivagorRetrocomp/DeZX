@@ -17,9 +17,9 @@
 ;   DE: last source address (compressed data)
 ;   BC: last destination address (decompressing)
 ; -----------------------------------------------------------------------------
-; compress forward with <-c> option
+; compress forward with <-c> option (<-classic> for salvador)
 ;
-; compress backward with <-b -c> options
+; compress backward with <-b -c> options (<-b -classic> for salvador)
 ;
 ; Compile with The Telemark Assembler (TASM) 3.2
 ; -----------------------------------------------------------------------------

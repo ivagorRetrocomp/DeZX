@@ -2,6 +2,7 @@
 ; ZX5v2 8080 decoder by Ivan Gorodetsky
 ; Based on ZX5 z80 decoder by Einar Saukas
 ; v1 (2021-10-05) - 150 bytes code + 5 bytes variables
+; v2 (2022-05-07) - 147 bytes code + 4 bytes variables
 ; -----------------------------------------------------------------------------
 ; Parameters (forward):
 ;   HL: source address (compressed data)
@@ -62,19 +63,19 @@ dzx5_new_offset:
 		shld dzx5_offset3
 		pop h
 		shld dzx5_offset2
-		sta dzx5_PreservedBit
+		mov h,a
 		add a
-		pop h
+		xthl
 #ifdef BACKWARD
 		call dzx5_elias
 		dcr d
-		rz
+		jz dzx5_elias_exit
 		dcr e
 #else
 		mvi e,0FEh
 		call dzx5_elias_loop
 		inr e
-		rz
+		jz dzx5_elias_exit
 #endif
 		mov d,e
 		mov e,m
@@ -82,10 +83,9 @@ dzx5_new_offset:
 #ifdef BACKWARD
 		inx d
 #endif
-		push d
 		xchg
-		lxi h,dzx5_PreservedBit
-		dcr m
+		xthl
+		dcr h
 		xchg
 		lxi d,1
 #ifdef BACKWARD
@@ -162,6 +162,7 @@ ldir_loop:
 		mov a,d
 		ora e
 		jnz ldir_loop
+dzx5_elias_exit:
 		pop psw
 #ifdef BACKWARD
 		inr e
@@ -169,8 +170,6 @@ ldir_loop:
 		add a
 		ret
 
-dzx5_PreservedBit:
-		.db 0
 dzx5_offset2:
 		.dw 0
 dzx5_offset3:

@@ -6,6 +6,7 @@
 ; v2 (2021-08-16) - 67-78 bytes forward / 67-77 bytes backward
 ; v3 (2021-08-19) - 66-78 bytes forward / 66-77 bytes backward (-1 byte with -y option)
 ; v4 (2021-08-20) - 66-78 bytes forward / 65-77 bytes backward (-1 byte with {-y and -b options})
+; v5 (2022-05-06) - 66-78 bytes forward / 65-77 bytes backward (slightly faster with -y option)
 ;
 ; ZX2_X_SKIP_INCREMENT (compressor -x option) - -4 bytes
 ; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -7 bytes
@@ -116,7 +117,7 @@ ldir:
 		NEXT_BC
 		dcr d
 		jnz ldir
-		mov a,e
+		add a
 #else		
 dzx2n_elias_skip:
 		rnc

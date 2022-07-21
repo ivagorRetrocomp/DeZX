@@ -7,6 +7,7 @@
 ; v3 (2021-08-19) - 66-78 bytes forward / 66-77 bytes backward (-1 byte with -y option)
 ; v4 (2021-08-20) - 66-78 bytes forward / 65-77 bytes backward (-1 byte with {-y and -b options})
 ; v5 (2022-05-06) - 66-78 bytes forward / 65-77 bytes backward (slightly faster with -y option)
+; v6 (2022-07-21) - 66-78 bytes forward / 65-77 bytes backward (bug fix for v5)
 ;
 ; ZX2_X_SKIP_INCREMENT (compressor -x option) - -4 bytes
 ; ZX2_Y_LIMIT_LENGTH (compressor -y option) - -7 bytes
@@ -108,7 +109,7 @@ dzx2n_elias_skip:
 		mov e,a
 		rnc
 		xchg\ dad h\ xchg
-		mov a,e
+		add a
 		jmp dzx2n_elias_loop
 ldir:
 		mov a,m
@@ -117,7 +118,7 @@ ldir:
 		NEXT_BC
 		dcr d
 		jnz ldir
-		add a
+		mov a,e
 #else		
 dzx2n_elias_skip:
 		rnc
